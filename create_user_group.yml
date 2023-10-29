@@ -1,0 +1,63 @@
+---
+- name: Ansible Playbook for Creating a user with an Encrypted Password
+  hosts: vm3
+  become: 'yes'
+  vars:
+    password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          34616333613232306431366136366232333333326263303966653162326563373332303931373532
+          3739656166343634376530623031663061346239616632390a646431356431376337356264633231
+          39653261313232643730663936373032623636633462316663616638396637663637616264313961
+          6538306239653564610a383965353936616235333835613835343463666531333265356337303233
+          3433
+  tasks:
+    - name: create pokemon.ben account
+      user:
+        name: pokemon.ben
+        password: "{{'%s' | format(password) |regex_replace('\n','') | password_hash('sha512') }}"
+        state: present
+        shell: /bin/bash
+        createhome: yes
+        groups: toto
+        append: yes
+        update_password: always
+        expires: -1
+
+    - name: add pokemon.ben to a primary  group
+      user:
+        name: pokemon.ben
+        group: pokemon.ben
+
+    - name: Generate  SSH key for Pikachu
+      user:
+        name: Pikachu
+        shell: /bin/bash
+        generate_ssh_key: yes
+        ssh_key_bits: 2048
+        ssh_key_file: .ssh/id_rsa
+
+    - name: Add the public key of ansible to Pikachu's authorized keys
+      authorized_key:
+         user: Pikachu
+         key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+
+    - name: Lock a user account
+      user:
+        name: pokemon.ben
+        shell: /usr/sbin/nologin  # Set the shell to /usr/sbin/nologin or /bin/false
+        remove: no
+
+    - name: Unlock Pokemon.ben user
+      user:
+        name: pokemon.ben
+        shell: /bin/bash
+        state: present
+
+    - name: create a group called Cybersec
+      group:
+        name: Cybersec
+        state: present
+        system: yes
+
+...
+

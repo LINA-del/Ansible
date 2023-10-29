@@ -1,0 +1,9 @@
+all:
+  hosts:
+    vm3:
+      ansible_host: 192.168.33.134
+
+  vars:
+    ansible_connection: ssh
+    ansible_ssh_user: toto
+    ansible_ssh_private_key_file: /home/ansible/.ssh/id_rsa

@@ -1,0 +1,25 @@
+---
+- name: Ansible Playbook to delete user & group
+  hosts: vm3
+  become: 'yes'
+
+  tasks:
+    - name:
+      user:
+        name: pokemon.ben
+        state: absent
+        remove: yes
+
+    - name: Remove Cybersec group
+      group:
+        name: Cybersec
+        state: absent
+...
+
+
+
+
+
+
+
+
